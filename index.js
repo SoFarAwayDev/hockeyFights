@@ -4,6 +4,7 @@ var fs = require('fs');
 var path = require('path');
 
 var express = require('express');
+var multer  = require('multer')
 var app = express();
 
 var compress = require('compression');
@@ -30,9 +31,39 @@ if (env.production) {
   });
 }
 
-app.post('/upload', function(req, res, next) {
-  res.end();
-});
+//var uploadToDist = multer({ dest: 'uploads/' }).single('videoFile');
+
+var storage = multer.diskStorage({
+    destination: function(req, file, callback) {
+      callback(null,__dirname + '/videos');
+    },
+    filename: function(req, file, callback){
+      callback(null, file.originalname);
+    }
+  });
+
+  var upload = multer({storage: storage}).single('videoFile');
+
+  app.post('/upload', function(req, res){
+    upload(req, res, function(err){
+        if(err) {
+          return res.end("Error");
+        }
+
+        res.end("Uploaded")
+    });
+  });
+
+/*app.post('/upload', uploadToDist, function(req, res){
+  var tmp_path = req.file.path;
+
+  var target_path = __dirname + '/videos' + req.file.originalname;
+
+  var src = fs.createReadStream(tmp_path);
+  var dest = fs.createWriteStream(target_path);
+  src.pipe(dest);
+  src.on('end', function() { res.end(); });
+});*/
 
 app.get('/*', function(req, res, next) {
   if(req.url.startsWith('/videos')){

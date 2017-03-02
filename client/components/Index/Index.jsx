@@ -7,7 +7,7 @@ class IndexComponent extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {timeStamps:[], videoLength: 0};
+    this.state = {timeStamps:[], videoLength: 0, videoSource:""};
   }
 
   openUploadClick(){
@@ -17,13 +17,15 @@ class IndexComponent extends Component {
   onDrop(files){
         var req = request.post('/upload');
         files.forEach((file)=> {
-            req.attach(file.name, file);
+            req.attach('videoFile', file);
         });
         req.end(() => this.fileUploaded(files[0].name));
     }
 
   fileUploaded(fileName){
-    console.log(`Uploaded ${fileName}`);
+    this.setState({videoSource: `/videos/${fileName}`})
+
+    this.refs.player.load();
   }
 
   componentDidMount(){
@@ -91,7 +93,7 @@ class IndexComponent extends Component {
                   <Player
                       playsInline
                       ref="player"
-                      src="/videos/trailer.mp4"
+                      src={this.state.videoSource}
                     />
                 </div>
                 <div className="time-stamps-row">
