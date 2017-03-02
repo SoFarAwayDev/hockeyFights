@@ -2,8 +2,15 @@ import React, { Component } from 'react';
 import { Player } from 'video-react';
 
 class IndexComponent extends Component {
- 
+
+  constructor(props) {
+    super(props);
+    this.state = {timeStamps:[], videoLength: 0};
+  }
+
   componentDidMount(){
+      this.refs.player.subscribeToStateChange(this.handleStateChange.bind(this));
+
       let newTimeStamps = [];
       for(let i = 10; i <= 300; i = i + 10){
           newTimeStamps.push(i);
@@ -12,12 +19,31 @@ class IndexComponent extends Component {
       this.setState({timeStamps: newTimeStamps} )
   }
 
-  render() {
-  debugger;
+  handleStateChange(state, prevState) {
 
-    let timeButtons = (this.state && this.state.timeStamps) ? 
+    if(state.duration != prevState.duration)
+    {
+      let newTimeStamps = [];
+      for(let i = 10; i <= state.duration; i = i + 10){
+          newTimeStamps.push(i);
+      }
+      this.setState({
+        videoLength: state.duration,
+        timeStamps: newTimeStamps
+      });
+    }
+  }
+
+  goToStemp(seconds) {
+      this.refs.player.seek(seconds);
+  }
+
+  render() {
+
+
+    let timeButtons = (this.state && this.state.timeStamps) ?
                           this.state.timeStamps.map((number, index) =>
-                            <button key={index} type="button" className="btn btn-default">index</button>
+                            <button key={index} type="button"   className="btn btn-default time-stamp-button" onClick={() => this.goToStemp(number)}>{number}</button>
                           ) : null
 
     return (
@@ -41,7 +67,8 @@ class IndexComponent extends Component {
                <div>
                   <Player
                       playsInline
-                      src="https://media.w3.org/2010/05/sintel/trailer_hd.mp4"
+                      ref="player"
+                      src="http://media.w3.org/2010/05/bunny/movie.mp4"
                     />
                 </div>
                 <div className="time-stamps-row">

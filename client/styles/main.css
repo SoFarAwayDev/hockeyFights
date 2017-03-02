@@ -4,6 +4,12 @@
     padding-top: 100px;
 }
 
-.time-stamps-row { 
+.time-stamps-row {
     margin-top: 30px;
+    overflow-x: scroll;
+    white-space: nowrap;
+}
+
+.btn-group > button.btn.time-stamp-button{
+  float:none!important;
 }
