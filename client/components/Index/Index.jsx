@@ -1,11 +1,29 @@
 import React, { Component } from 'react';
 import { Player } from 'video-react';
+import Dropzone from 'react-dropzone';
+import request from 'superagent';
 
 class IndexComponent extends Component {
 
   constructor(props) {
     super(props);
     this.state = {timeStamps:[], videoLength: 0};
+  }
+
+  openUploadClick(){
+    this.refs.dropUploader.open();
+  }
+
+  onDrop(files){
+        var req = request.post('/upload');
+        files.forEach((file)=> {
+            req.attach(file.name, file);
+        });
+        req.end(() => this.fileUploaded(files[0].name));
+    }
+
+  fileUploaded(fileName){
+    console.log(`Uploaded ${fileName}`);
   }
 
   componentDidMount(){
@@ -58,10 +76,15 @@ class IndexComponent extends Component {
           </div>
         </nav>
         <div className="container content-block">
-            <div className="col-md-2">
-                <button type="button" className="btn btn-primary">
-                  Upload Video
-                </button>
+            <div className="col-md-3 uploader-block">
+              <Dropzone ref="dropUploader" onDrop={this.onDrop.bind(this)}>
+                  <div className="drop-text-block">
+                    <div className="drop-text">Drop videos here</div>
+                  </div>
+              </Dropzone>
+              <button type="button" className="btn btn-primary upload-button" onClick={() => this.openUploadClick()}>
+                Upload Video
+              </button>
             </div>
             <div className="col-md-8">
                <div>

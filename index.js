@@ -30,6 +30,10 @@ if (env.production) {
   });
 }
 
+app.post('/upload', function(req, res, next) {
+  res.end();
+});
+
 app.get('/*', function(req, res, next) {
   if(req.url.startsWith('/videos')){
     return next();
