@@ -30,11 +30,17 @@ if (env.production) {
   });
 }
 
-app.get('/*', function(req, res) {
+app.get('/*', function(req, res, next) {
+  if(req.url.startsWith('/videos')){
+    return next();
+  }
+
   res.render('index', {
     env: env
   });
 });
+
+app.use('/videos', express.static(__dirname + '/videos'));
 
 var port = Number(process.env.PORT || 3001);
 app.listen(port, function () {

@@ -68,7 +68,7 @@ class IndexComponent extends Component {
                   <Player
                       playsInline
                       ref="player"
-                      src="http://media.w3.org/2010/05/bunny/movie.mp4"
+                      src="/videos/trailer.mp4"
                     />
                 </div>
                 <div className="time-stamps-row">
