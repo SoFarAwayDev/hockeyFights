@@ -1,7 +1,9 @@
 'use strict';
 
+var path = require('path');
 var webpack = require('webpack');
-var config = require('./webpack.config.base.js');
+var config = require('./webpack.config.base.js'); 
+var ManifestPlugin = require('webpack-manifest-plugin');
 
 var SaveAssetsJson = require('assets-webpack-plugin');
 
@@ -10,17 +12,16 @@ config.profile = false;
 config.devtool = '#source-map';
 
 config.output = {
-  path: './client/dist',
-  publicPath: '/client/dist/',
-  filename: 'bundle.[hash].min.js'
-};
+    path: path.join(__dirname, 'dist'),
+    filename: 'bundle.[chunkhash].js',
+    publicPath: '/dist/'
+}; 
 
 config.plugins = config.plugins.concat([
   new webpack.optimize.OccurrenceOrderPlugin(true),
-  new SaveAssetsJson({
-    path: process.cwd(),
-    filename: 'assets.json'
-  }),
+  new ManifestPlugin({
+         fileName: 'build-manifest.json'
+    }),
   new webpack.DefinePlugin({
     'process.env': {
       NODE_ENV: JSON.stringify('production')

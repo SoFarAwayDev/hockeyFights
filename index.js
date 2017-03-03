@@ -10,6 +10,8 @@ var app = express();
 var compress = require('compression');
 var layouts = require('express-ejs-layouts');
 
+var readFile = require('jsonfile').readFileSync; 
+
 app.set('layout');
 app.set('view engine', 'ejs');
 app.set('view options', {layout: 'layout'});
@@ -18,6 +20,7 @@ app.set('views', path.join(process.cwd(), '/server/views'));
 app.use(compress());
 app.use(layouts);
 app.use('/client', express.static(path.join(process.cwd(), '/client')));
+app.use('/dist', express.static(__dirname + '/dist'));
 
 app.disable('x-powered-by');
 
@@ -25,13 +28,8 @@ var env = {
   production: process.env.NODE_ENV === 'production'
 };
 
-if (env.production) {
-  Object.assign(env, {
-    assets: JSON.parse(fs.readFileSync(path.join(process.cwd(), 'assets.json')))
-  });
-}
-
-//var uploadToDist = multer({ dest: 'uploads/' }).single('videoFile');
+const manifestPath = path.join(__dirname, 'dist/build-manifest.json');
+const manifest = readFile(manifestPath); 
 
 var storage = multer.diskStorage({
     destination: function(req, file, callback) {
@@ -54,16 +52,6 @@ var storage = multer.diskStorage({
     });
   });
 
-/*app.post('/upload', uploadToDist, function(req, res){
-  var tmp_path = req.file.path;
-
-  var target_path = __dirname + '/videos' + req.file.originalname;
-
-  var src = fs.createReadStream(tmp_path);
-  var dest = fs.createWriteStream(target_path);
-  src.pipe(dest);
-  src.on('end', function() { res.end(); });
-});*/
 
 app.get('/*', function(req, res, next) {
   if(req.url.startsWith('/videos')){
@@ -71,7 +59,8 @@ app.get('/*', function(req, res, next) {
   }
 
   res.render('index', {
-    env: env
+    env: env,
+    jsBundle: '/dist/' + manifest['main.js']
   });
 });
 
